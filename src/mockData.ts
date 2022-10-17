@@ -129,6 +129,7 @@ export const mockedRole = {
     ],
   },
   system_user: {
+    id: "id system user",
     name: "system_user",
     permissions: [],
   },
@@ -137,5 +138,18 @@ export const mockedRole = {
 // dummy policy
 export const mockedPolicies = {
   enableTeamCreation: "true",
-  enableOnlyAdminIntegrations: "false",
+  // enableOnlyAdminIntegrations: "false",
+};
+
+export const defaultRole = {
+  id: "",
+  name: "",
+  display_name: "",
+  description: "",
+  create_at: 0,
+  update_at: 0,
+  delete_at: 0,
+  permissions: [],
+  scheme_managed: false,
+  built_in: false,
 };
