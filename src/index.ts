@@ -5,6 +5,21 @@ import {
   mockedPolicies,
 } from "./mockData.ts";
 
+// @mattermost types
+// ----------------
+type Role = {
+  id: string;
+  name: string;
+  display_name: string;
+  description: string;
+  create_at: number;
+  update_at: number;
+  delete_at: number;
+  permissions: string[];
+  scheme_managed: boolean;
+  built_in: boolean;
+};
+
 // types
 // -----
 
@@ -70,7 +85,7 @@ type RoleValue = {
   permissions: string[];
 };
 
-type Role = {
+type Roles = {
   system_user?: RoleValue;
   system_admin?: RoleValue;
   team_admin?: RoleValue;
@@ -96,7 +111,7 @@ const policyDecoder = D.objectDecoder<Policy>({
 
 const roleValueDecoder = D.objectDecoder<RoleValue>({
   name: D.stringDecoder,
-  permissions: D.arrayDecoder(D.oneOfDecoders(D.stringDecoder)),
+  permissions: D.arrayDecoder(D.stringDecoder),
 });
 
 const rolePossibleValueDecoder = D.oneOfDecoders(
@@ -104,7 +119,7 @@ const rolePossibleValueDecoder = D.oneOfDecoders(
   D.undefinedDecoder
 );
 
-const roleDecoder = D.objectDecoder<Role>({
+const roleDecoder = D.objectDecoder<Roles>({
   system_admin: rolePossibleValueDecoder,
   system_user: rolePossibleValueDecoder,
   team_admin: rolePossibleValueDecoder,
@@ -129,10 +144,10 @@ const mattermostPermissionsDecoder = D.objectDecoder<MMPermissions>({
 // Check JSON valid types
 // ---------------------------
 
-// Given Role should remove undefided properties
+// Given Roles should remove undefined keys
 //
-// Role => Role
-function removeUndefinedProperties(role: Role): Role {
+// Roles => Roles
+function removeUndefinedProperties(role: Roles): Roles {
   return Object.fromEntries(
     Object.entries(role).filter(([, value]) => value !== undefined)
   );
@@ -140,24 +155,24 @@ function removeUndefinedProperties(role: Role): Role {
 
 // Given JSON object, should remove undefined values from decoded roles
 //
-// (unknown) => D.Result<Role>
-function decodeRoles(roles: unknown): D.Result<Role> {
+// (unknown) => D.Result<Roles>
+function decodeRoles(roles: unknown): D.Result<Roles> {
   return roleDecoder.decode(roles).map(removeUndefinedProperties);
 }
 
-// Given D.Result<Role> should check Result.type === "Ok" and return Role
-// else return empty Role
+// Given D.Result<Roles> should check Result.type === "Ok" and return Roles
+// else return empty Roles
 //
-// D.Result<Role> => Role
-function checkRoles(roles: D.Result<Role>): Role {
+// D.Result<Roles> => Roles
+function checkRoles(roles: D.Result<Roles>): Roles {
   switch (roles.type) {
     case "OK":
       return roles.value;
     case "ERR":
       console.error(roles.message);
-      return {} as Role;
+      return {} as Roles;
     default:
-      return {} as Role;
+      return {} as Roles;
   }
 }
 
@@ -214,7 +229,7 @@ function isValidPermissions(permissions: unknown): boolean {
   }
 }
 
-// Role data
+// Roles data
 // ------------
 
 // Given Mapping, MappingKey, MappingValue, should return a list of MappingRole
@@ -259,11 +274,11 @@ function removePermissionToRoleValue(
   };
 }
 
-// Given list of MappingRole, Role
-// should drop the Role that is not present in the list of MappingRole
+// Given list of MappingRole, Roles
+// should drop the Roles that is not present in the list of MappingRole
 //
-// MappingRole[] => Role => Role
-function dropNotNeededRoles(mappingRoles: MappingRole[], role: Role): Role {
+// MappingRole[] => Roles => Roles
+function dropNotNeededRoles(mappingRoles: MappingRole[], role: Roles): Roles {
   return mappingRoles.reduce((acc, mappingRole) => {
     const roleKeys = Object.keys(role);
     const { roleName } = mappingRole;
@@ -274,12 +289,15 @@ function dropNotNeededRoles(mappingRoles: MappingRole[], role: Role): Role {
   }, {});
 }
 
-// Given list MappingRole, Role, iterate over MappingRole comparing
-// MappingRole.name with Role keys, if equals add or remove permission
+// Given list MappingRole, Roles, iterate over MappingRole comparing
+// MappingRole.name with Roles keys, if equals add or remove permission
 // based on shouldHave value
 //
-// MappingRole[] => Role => Role
-function addOrRemovePermissions(mappingRoles: MappingRole[], role: Role): Role {
+// MappingRole[] => Roles => Roles
+function addOrRemovePermissions(
+  mappingRoles: MappingRole[],
+  role: Roles
+): Roles {
   return mappingRoles.reduce((acc, mappingRole) => {
     const { roleName, permission, shouldHave } = mappingRole;
     const roleValue = acc[roleName];
@@ -415,16 +433,20 @@ function getMapping(): Mapping {
 // Init
 // -------
 
-// Given unknown roles, unknown policies
-// ckeck roles and policies are valid.
-// should return a new Role with the updated permissions
+// Given unknown policies, unknown roles,
+// ckeck that roles and policies are valid.
+// should return a new Roles with the updated permissions
 //
-// unnown => unknown => unknown => Role
-function getNewRole(roles: unknown = {}, policies: unknown = {}): Role {
+// unnown => unknown => unknown => Roles
+function getNewRole(
+  policies: unknown = {},
+  roles: Record<string, Role> = {}
+): Record<string, Role> {
   if (!isValidPermissions(MattermostPermissions)) {
-    return {} as Role;
+    return {} as Record<string, Role>;
   }
 
+  // console.log("roles", roles);
   const decodedRoles = decodeRoles(roles);
   const checkedRoles = checkRoles(decodedRoles);
   const decodedPolicies = decodePolicies(policies);
@@ -433,12 +455,16 @@ function getNewRole(roles: unknown = {}, policies: unknown = {}): Role {
   const mappingRoles = getPolicyMappingRoles(checkedPolicies, mapping);
   const filteredRoles = dropNotNeededRoles(mappingRoles, checkedRoles);
 
-  return addOrRemovePermissions(mappingRoles, filteredRoles);
+  return addOrRemovePermissions(mappingRoles, filteredRoles) as Record<
+    string,
+    Role
+  >;
 }
 
 // Tests
 // -------
 
 console.log(" ------------------ start ----------------------");
-console.log(getNewRole(mockedRole, mockedPolicies));
+// getNewRole(mockedPolicies, mockedRole);
+console.log(getNewRole(mockedPolicies, mockedRole));
 console.log(" ------------------ end ----------------------");
