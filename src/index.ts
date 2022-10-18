@@ -1,8 +1,8 @@
 import * as D from "json-decoder";
 import {
   MattermostPermissions,
-  mockedRole,
   mockedPolicies,
+  mockedRole,
 } from "./mockData.ts";
 
 // @mattermost types
@@ -109,23 +109,6 @@ const policyDecoder = D.objectDecoder<Policy>({
   enableOnlyAdminIntegrations: policyValueDecoder,
 });
 
-const roleValueDecoder = D.objectDecoder<RoleValue>({
-  name: D.stringDecoder,
-  permissions: D.arrayDecoder(D.stringDecoder),
-});
-
-const rolePossibleValueDecoder = D.oneOfDecoders(
-  roleValueDecoder,
-  D.undefinedDecoder
-);
-
-const roleDecoder = D.objectDecoder<Roles>({
-  system_admin: rolePossibleValueDecoder,
-  system_user: rolePossibleValueDecoder,
-  team_admin: rolePossibleValueDecoder,
-  team_user: rolePossibleValueDecoder,
-});
-
 //  Decode mattremost Permissions.
 //  To check if MMPermission have the correct values
 const mattermostPermissionsDecoder = D.objectDecoder<MMPermissions>({
@@ -143,38 +126,6 @@ const mattermostPermissionsDecoder = D.objectDecoder<MMPermissions>({
 
 // Check JSON valid types
 // ---------------------------
-
-// Given Roles should remove undefined keys
-//
-// Roles => Roles
-function removeUndefinedProperties(role: Roles): Roles {
-  return Object.fromEntries(
-    Object.entries(role).filter(([, value]) => value !== undefined)
-  );
-}
-
-// Given JSON object, should remove undefined values from decoded roles
-//
-// (unknown) => D.Result<Roles>
-function decodeRoles(roles: unknown): D.Result<Roles> {
-  return roleDecoder.decode(roles).map(removeUndefinedProperties);
-}
-
-// Given D.Result<Roles> should check Result.type === "Ok" and return Roles
-// else return empty Roles
-//
-// D.Result<Roles> => Roles
-function checkRoles(roles: D.Result<Roles>): Roles {
-  switch (roles.type) {
-    case "OK":
-      return roles.value;
-    case "ERR":
-      console.error(roles.message);
-      return {} as Roles;
-    default:
-      return {} as Roles;
-  }
-}
 
 // Given Policy should remove undefined properties
 //
@@ -223,8 +174,6 @@ function isValidPermissions(permissions: unknown): boolean {
         result.message,
         ". MMPermission should match with mattermost Permissions, same keys and values"
       );
-      return false;
-    default:
       return false;
   }
 }
@@ -445,15 +394,12 @@ function getNewRole(
   if (!isValidPermissions(MattermostPermissions)) {
     return {} as Record<string, Role>;
   }
-
-  // console.log("roles", roles);
-  const decodedRoles = decodeRoles(roles);
-  const checkedRoles = checkRoles(decodedRoles);
   const decodedPolicies = decodePolicies(policies);
   const checkedPolicies = checkPolicies(decodedPolicies);
+
   const mapping = getMapping();
   const mappingRoles = getPolicyMappingRoles(checkedPolicies, mapping);
-  const filteredRoles = dropNotNeededRoles(mappingRoles, checkedRoles);
+  const filteredRoles = dropNotNeededRoles(mappingRoles, roles);
 
   return addOrRemovePermissions(mappingRoles, filteredRoles) as Record<
     string,
@@ -463,8 +409,6 @@ function getNewRole(
 
 // Tests
 // -------
-
 console.log(" ------------------ start ----------------------");
-// getNewRole(mockedPolicies, mockedRole);
-console.log(getNewRole(mockedPolicies, mockedRole));
+console.log("gtNewRole -> ", getNewRole(mockedPolicies, mockedRole));
 console.log(" ------------------ end ----------------------");
