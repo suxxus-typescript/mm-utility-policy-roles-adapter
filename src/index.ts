@@ -20,8 +20,8 @@ type Role = {
   built_in: boolean;
 };
 
-// types
-// -----
+// private types
+// -------------
 
 // enumeration of possible values for Mapping type
 enum MMPermission {
@@ -42,14 +42,14 @@ type MappingKey =
   | "enableOnlyAdminIntegrations";
 
 type MappingValue = "true" | "false";
-type MappingRolename =
+type MappingRoleName =
   | "team_user"
   | "team_admin"
   | "system_admin"
   | "system_user";
 
 type MappingRole = {
-  roleName: MappingRolename;
+  roleName: MappingRoleName;
   permission: MMPermission;
   shouldHave: boolean;
 };
@@ -79,17 +79,12 @@ type Policy = {
 
 // Role types
 // ----------
-//
-type RoleValue = {
-  name: string;
-  permissions: string[];
-};
 
 type Roles = {
-  system_user?: RoleValue;
-  system_admin?: RoleValue;
-  team_admin?: RoleValue;
-  team_user?: RoleValue;
+  system_user: Role;
+  system_admin: Role;
+  team_admin: Role;
+  team_user: Role;
 };
 
 // Decoders, to check if JSON object is valid
@@ -196,14 +191,11 @@ function getMappingRoles(
 // update permissios list with oermission value
 // RoleValue permissions list should contain unique values
 //
-// MMPermission => RoleValue => RoleValue
-function addPermissionToRoleValue(
-  permission: MMPermission,
-  roleValue: RoleValue
-): RoleValue {
+// MMPermission => Role => Role
+function addPermissionToRoleValue(permission: MMPermission, role: Role): Role {
   return {
-    ...roleValue,
-    permissions: [...new Set([...roleValue.permissions, permission])],
+    ...role,
+    permissions: [...new Set([...role.permissions, permission])],
   };
 }
 
@@ -213,29 +205,14 @@ function addPermissionToRoleValue(
 // MMPermission => RoleValue => RoleValue
 function removePermissionToRoleValue(
   permission: MMPermission,
-  roleValue: RoleValue
-): RoleValue {
+  role: Role
+): Role {
   return {
-    ...roleValue,
-    permissions: roleValue.permissions.filter(
+    ...role,
+    permissions: role.permissions.filter(
       (rolePermission) => rolePermission !== permission
     ),
   };
-}
-
-// Given list of MappingRole, Roles
-// should drop the Roles that is not present in the list of MappingRole
-//
-// MappingRole[] => Roles => Roles
-function dropNotNeededRoles(mappingRoles: MappingRole[], role: Roles): Roles {
-  return mappingRoles.reduce((acc, mappingRole) => {
-    const roleKeys = Object.keys(role);
-    const { roleName } = mappingRole;
-    if (roleKeys.includes(roleName)) {
-      return { ...acc, [roleName]: role[roleName] };
-    }
-    return acc;
-  }, {});
 }
 
 // Given list MappingRole, Roles, iterate over MappingRole comparing
@@ -379,6 +356,54 @@ function getMapping(): Mapping {
   };
 }
 
+// Should return default Roles
+//
+// () => Roles
+function getDefaultRoles(): Roles {
+  const role: Role = {
+    id: "",
+    name: "",
+    display_name: "",
+    description: "",
+    create_at: 0,
+    update_at: 0,
+    delete_at: 0,
+    permissions: [],
+    scheme_managed: false,
+    built_in: false,
+  };
+
+  return {
+    system_admin: role,
+    system_user: role,
+    team_admin: role,
+    team_user: role,
+  };
+}
+
+// Given Record<string. Role> should check if string matches MappingRoleName
+// if matches, should add it to a new Roles
+//
+// Record<string, Role> => Roles
+function getRoles(roles: Record<string, Role>): Roles {
+  const mappingKeys: MappingRoleName[] = [
+    "system_user",
+    "system_admin",
+    "team_admin",
+    "team_user",
+  ];
+
+  return Object.entries(roles).reduce(
+    (acc, [key, value]) => {
+      if (mappingKeys.includes(key as MappingRoleName)) {
+        return { ...acc, [key]: value };
+      }
+      return acc;
+    },
+    { ...getDefaultRoles() }
+  );
+}
+
 // Init
 // -------
 
@@ -390,25 +415,23 @@ function getMapping(): Mapping {
 function getNewRole(
   policies: unknown = {},
   roles: Record<string, Role> = {}
-): Record<string, Role> {
+): Roles {
   if (!isValidPermissions(MattermostPermissions)) {
-    return {} as Record<string, Role>;
+    return getDefaultRoles();
   }
+
   const decodedPolicies = decodePolicies(policies);
   const checkedPolicies = checkPolicies(decodedPolicies);
 
   const mapping = getMapping();
   const mappingRoles = getPolicyMappingRoles(checkedPolicies, mapping);
-  const filteredRoles = dropNotNeededRoles(mappingRoles, roles);
+  const filteredRoles = getRoles(roles);
 
-  return addOrRemovePermissions(mappingRoles, filteredRoles) as Record<
-    string,
-    Role
-  >;
+  return addOrRemovePermissions(mappingRoles, filteredRoles);
 }
 
 // Tests
 // -------
 console.log(" ------------------ start ----------------------");
-console.log("gtNewRole -> ", getNewRole(mockedPolicies, mockedRole));
+console.log("getNewRole -> ", getNewRole(mockedPolicies, mockedRole));
 console.log(" ------------------ end ----------------------");
