@@ -412,7 +412,7 @@ function getRoles(roles: Record<string, Role>): Roles {
 // should return a new Roles with the updated permissions
 //
 // unnown => unknown => unknown => Roles
-function getNewRole(
+function rolesFromMapping(
   policies: unknown = {},
   roles: Record<string, Role> = {}
 ): Roles {
@@ -433,5 +433,5 @@ function getNewRole(
 // Tests
 // -------
 console.log(" ------------------ start ----------------------");
-console.log("getNewRole -> ", getNewRole(mockedPolicies, mockedRole));
+console.log("getNewRole -> ", rolesFromMapping(mockedPolicies, mockedRole));
 console.log(" ------------------ end ----------------------");
