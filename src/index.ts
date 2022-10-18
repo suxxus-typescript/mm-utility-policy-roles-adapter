@@ -41,7 +41,7 @@ type MappingKey =
   | "editOthersPosts"
   | "enableOnlyAdminIntegrations";
 
-type MappingValue = "true" | "false";
+type MappingOptions = "true" | "false";
 type MappingRoleName =
   | "team_user"
   | "team_admin"
@@ -53,6 +53,7 @@ type MappingRole = {
   permission: MMPermission;
   shouldHave: boolean;
 };
+
 type Mapping = {
   enableTeamCreation: { true: MappingRole[]; false: MappingRole[] };
   editOthersPosts: { true: MappingRole[]; false: MappingRole[] };
@@ -176,13 +177,13 @@ function isValidPermissions(permissions: unknown): boolean {
 // Roles data
 // ------------
 
-// Given Mapping, MappingKey, MappingValue, should return a list of MappingRole
+// Given Mapping, MappingKey, MappingOptions, should return a list of MappingRole
 //
-// Mapping => MappingKey => MappingValue => MappingRole[]
+// Mapping => MappingKey => MappingOptions => MappingRole[]
 function getMappingRoles(
   mapping: Mapping,
   key: MappingKey,
-  value: MappingValue
+  value: MappingOptions
 ): MappingRole[] {
   return mapping[key][value];
 }
@@ -254,7 +255,7 @@ function getPolicyMappingRoles(
   }
 
   return Object.entries(policy).flatMap(([key, value]) =>
-    getMappingRoles(mapping, key as MappingKey, value as MappingValue)
+    getMappingRoles(mapping, key as MappingKey, value as MappingOptions)
   );
 }
 
@@ -403,6 +404,9 @@ function getRoles(roles: Record<string, Role>): Roles {
     { ...getDefaultRoles() }
   );
 }
+
+// Mappings values from Role
+// -------------------------
 
 // Init
 // -------
