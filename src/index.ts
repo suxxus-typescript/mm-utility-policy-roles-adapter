@@ -145,7 +145,7 @@ function decodePolicies(policies: unknown): D.Result<Policy> {
 }
 
 // Given D.Result<Policy> should check Result.type === "Ok" and return Policy
-// else show an error and return empty Policy
+// else show annerror and return empty Policy
 //
 // D.Result<Policy> => Policy
 function checkPolicies(policies: D.Result<Policy>): Policy {
@@ -153,7 +153,7 @@ function checkPolicies(policies: D.Result<Policy>): Policy {
     case "OK":
       return policies.value;
     case "ERR":
-      console.error(policies.message);
+      console.error(policies.message, ", Ckeck policy key and values");
       return {} as Policy;
     default:
       return {} as Policy;
@@ -421,7 +421,10 @@ function getRoles(roles: Record<string, Role>): Roles {
 // if not matches should print a warning and return ""
 //
 // MappingKey => Roles => string
-function mappingValueFromRoles(mappingKey: MappingKey, roles: Roles): string {
+export function mappingValueFromRoles(
+  mappingKey: MappingKey,
+  roles: Roles
+): string {
   const mappingRolesTrue = getMappingRoles(getMapping(), mappingKey, "true");
   const mappingRolesFalse = getMappingRoles(getMapping(), mappingKey, "false");
 
@@ -466,7 +469,7 @@ function mappingValueFromRoles(mappingKey: MappingKey, roles: Roles): string {
 // should return a new Roles with the updated permissions
 //
 // unnown => unknown => unknown => Roles
-function rolesFromMapping(
+export function rolesFromMapping(
   policies: unknown = {},
   roles: Record<string, Role> = {}
 ): Roles {
