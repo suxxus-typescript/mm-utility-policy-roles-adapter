@@ -162,7 +162,7 @@ function checkPolicies(policies: D.Result<Policy>): Policy {
 
 // Given permissions JSON object, should return true if policies are valid
 // else show an error return false
-// we need to ckeck if MMPermission match with mattermostPermissions
+// we need to ckeck if MMPermission match with mattermost Permissions Object
 //
 // (unknown) => boolean
 function isValidPermissions(permissions: unknown): boolean {
