@@ -193,17 +193,6 @@ function getMappingRoles(
   return mapping[key][value];
 }
 
-// Given Mapping, MappingKey, should get a part of Mapping
-// and return a list of MappingValue
-
-// Mapping => MappingKey => MappingValue[]
-function mappingValueFromRoless(
-  mapping: Mapping,
-  key: MappingKey
-): MappingValue {
-  return mapping[key];
-}
-
 // Given MMPermission, RoleValue, should
 // update permissios list with oermission value
 // RoleValue permissions list should contain unique values
