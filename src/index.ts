@@ -494,8 +494,9 @@ function rolesFromMapping(
   return addOrRemovePermissions(mappingRoles, filteredRoles);
 }
 
-// Tests
+// logs
 // -------
+//
 console.log(" ------------------ start ----------------------");
 console.log(
   "rolesFromMapping -> ",
