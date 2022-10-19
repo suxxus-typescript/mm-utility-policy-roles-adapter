@@ -129,16 +129,10 @@ export const mockedRole = {
     ],
   },
   system_user: {
-    id: "id system user",
     name: "system_user",
-    display_name: "System User",
-    description: "System User",
-    create_at: 0,
-    update_at: 0,
-    delete_at: 0,
     permissions: [],
-    scheme_managed: false,
-    built_in: true,
+    id: "system_user",
+    display_name: "system_user",
   },
 };
 
