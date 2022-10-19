@@ -387,27 +387,73 @@ function getDefaultRoles(): Roles {
   };
 }
 
-// Given Record<string. Role> should check if string matches MappingRoleName
-// if matches, should add it to a new Roles
+// Given Record<string, Role>, MappingRoleName list,
+// if MappingRoleName is in MappingRoleName list,
+// should merge the current role with the default role
 //
-// Record<string, Role> => Roles
-function getRoles(roles: Record<string, Role>): Roles {
-  const mappingKeys: MappingRoleName[] = [
-    "system_user",
-    "system_admin",
-    "team_admin",
-    "team_user",
-  ];
+// Record<string, Role> => MappingRoleName[] => Roles
+function updateWithDefaultRoles(
+  roles: Record<string, Role>,
+  mappingRoleNames: MappingRoleName[]
+): Roles {
+  const defaultRoles = getDefaultRoles();
 
-  return Object.entries(roles).reduce(
-    (acc, [key, value]) => {
-      if (mappingKeys.includes(key as MappingRoleName)) {
-        return { ...acc, [key]: value };
-      }
-      return acc;
-    },
-    { ...getDefaultRoles() }
-  );
+  return mappingRoleNames.reduce((acc, mappingRoleName) => {
+    const role = roles[mappingRoleName];
+    if (role) {
+      const defaultRole = defaultRoles[mappingRoleName];
+      const mergedRole = { ...defaultRole, ...role };
+      return { ...acc, [mappingRoleName]: mergedRole };
+    }
+    return { ...acc, [mappingRoleName]: defaultRoles[mappingRoleName] };
+  }, defaultRoles);
+}
+
+// Given unknown policies, unknown roles,
+// ckeck that roles and policies are valid.
+// should return a new Roles with the updated permissions
+//
+// unnown => unknown => unknown => Roles
+function getUpdatedRoles(
+  policies: unknown = {},
+  roles: Record<string, Role> = {}
+): Roles {
+  if (!isValidPermissions(MattermostPermissions)) {
+    return getDefaultRoles();
+  }
+
+  const decodedPolicies = decodePolicies(policies);
+  const checkedPolicies = checkPolicies(decodedPolicies);
+  if (Object.keys(checkedPolicies).length === 0) {
+    return getDefaultRoles();
+  }
+
+  const mapping = getMapping();
+  const mappingRoles = getPolicyMappingRoles(checkedPolicies, mapping);
+
+  const mappingRoleNames = mappingRoles.map((mappingRole) => {
+    return mappingRole.roleName;
+  });
+
+  const filteredRoles = updateWithDefaultRoles(roles, mappingRoleNames);
+
+  return addOrRemovePermissions(mappingRoles, filteredRoles);
+}
+
+// should remove the not updated roles
+//
+// unnown => unknown => Record<string, Role>
+export function rolesFromMapping(
+  policies: unknown = {},
+  roles: Record<string, Role> = {}
+): Record<string, Role> {
+  const updatedRoles: Roles = getUpdatedRoles(policies, roles);
+  return Object.entries(updatedRoles).reduce((acc, [key, value]) => {
+    if (value.name !== "") {
+      return { ...acc, [key]: value };
+    }
+    return acc;
+  }, {});
 }
 
 // Mappings values from Role
@@ -461,42 +507,18 @@ export function mappingValueFromRoles(
   return value;
 }
 
-// Init
-// -------
-
-// Given unknown policies, unknown roles,
-// ckeck that roles and policies are valid.
-// should return a new Roles with the updated permissions
-//
-// unnown => unknown => unknown => Roles
-export function rolesFromMapping(
-  policies: unknown = {},
-  roles: Record<string, Role> = {}
-): Roles {
-  if (!isValidPermissions(MattermostPermissions)) {
-    return getDefaultRoles();
-  }
-
-  const decodedPolicies = decodePolicies(policies);
-  const checkedPolicies = checkPolicies(decodedPolicies);
-
-  const mapping = getMapping();
-  const mappingRoles = getPolicyMappingRoles(checkedPolicies, mapping);
-  const filteredRoles = getRoles(roles);
-
-  return addOrRemovePermissions(mappingRoles, filteredRoles);
-}
-
 // logs
 // -------
 //
-console.log(" ------------------ start ----------------------");
-console.log(
-  "rolesFromMapping -> ",
-  rolesFromMapping(mockedPolicies, mockedRole).system_user.permissions
-);
-console.log(
-  "mappingValueFromRoles ->",
-  mappingValueFromRoles("enableTeamCreation", mockedRole)
-);
-console.log(" ------------------ end ----------------------");
+// console.log(" ------------------ start ----------------------");
+// console.log(
+//   "rolesFromMapping -> ",
+//   rolesFromMapping(mockedPolicies, mockedRole)
+// );
+// // rolesFromMapping(mockedPolicies, mockedRole);
+//
+// console.log(
+//   "mappingValueFromRoles ->",
+//   mappingValueFromRoles("enableTeamCreation", mockedRole)
+// );
+// console.log(" ------------------ end ----------------------");
