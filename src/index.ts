@@ -197,7 +197,10 @@ function getMappingRoles(
 // and return a list of MappingValue
 
 // Mapping => MappingKey => MappingValue[]
-function getMappingValues(mapping: Mapping, key: MappingKey): MappingValue {
+function mappingValueFromRoless(
+  mapping: Mapping,
+  key: MappingKey
+): MappingValue {
   return mapping[key];
 }
 
@@ -421,6 +424,50 @@ function getRoles(roles: Record<string, Role>): Roles {
 // Mappings values from Role
 // -------------------------
 
+// Given MappingKey, Roles, should check if given roles
+// fulfill the requirements for MappingRole.shouldHave
+// if matches for "true" should return "true"
+// if matches for "false" should return "false"
+// if not matches should print a warning and return ""
+//
+// MappingKey => Roles => string
+function mappingValueFromRoles(mappingKey: MappingKey, roles: Roles): string {
+  const mappingRolesTrue = getMappingRoles(getMapping(), mappingKey, "true");
+  const mappingRolesFalse = getMappingRoles(getMapping(), mappingKey, "false");
+
+  let value = "";
+
+  ["true", "false"].forEach((v) => {
+    const mappingRoles = v === "true" ? mappingRolesTrue : mappingRolesFalse;
+
+    mappingRoles.forEach((mappingRole) => {
+      const { roleName, permission, shouldHave } = mappingRole;
+      const role = roles[roleName];
+
+      if (role) {
+        const hasPermission = role.permissions.includes(permission);
+        const cond1 = shouldHave && hasPermission;
+        const cond2 = !shouldHave && !hasPermission;
+
+        switch (true) {
+          case cond1:
+            value = "true";
+            break;
+          case cond2:
+            value = "false";
+            break;
+        }
+      }
+    });
+  });
+
+  if (value === "") {
+    console.warn(`Warning: Could not get value for ${mappingKey} from roles.`);
+  }
+
+  return value;
+}
+
 // Init
 // -------
 
@@ -453,5 +500,9 @@ console.log(" ------------------ start ----------------------");
 console.log(
   "rolesFromMapping -> ",
   rolesFromMapping(mockedPolicies, mockedRole).system_user.permissions
+);
+console.log(
+  "mappingValueFromRoles ->",
+  mappingValueFromRoles("enableTeamCreation", mockedRole)
 );
 console.log(" ------------------ end ----------------------");
