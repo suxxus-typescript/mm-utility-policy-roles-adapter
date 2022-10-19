@@ -54,10 +54,15 @@ type MappingRole = {
   shouldHave: boolean;
 };
 
+type MappingValue = {
+  true: MappingRole[];
+  false: MappingRole[];
+};
+
 type Mapping = {
-  enableTeamCreation: { true: MappingRole[]; false: MappingRole[] };
-  editOthersPosts: { true: MappingRole[]; false: MappingRole[] };
-  enableOnlyAdminIntegrations: { true: MappingRole[]; false: MappingRole[] };
+  enableTeamCreation: MappingValue;
+  editOthersPosts: MappingValue;
+  enableOnlyAdminIntegrations: MappingValue;
 };
 
 type MMPermissions = {
@@ -186,6 +191,14 @@ function getMappingRoles(
   value: MappingOptions
 ): MappingRole[] {
   return mapping[key][value];
+}
+
+// Given Mapping, MappingKey, should get a part of Mapping
+// and return a list of MappingValue
+
+// Mapping => MappingKey => MappingValue[]
+function getMappingValues(mapping: Mapping, key: MappingKey): MappingValue {
+  return mapping[key];
 }
 
 // Given MMPermission, RoleValue, should
@@ -437,5 +450,8 @@ function rolesFromMapping(
 // Tests
 // -------
 console.log(" ------------------ start ----------------------");
-console.log("getNewRole -> ", rolesFromMapping(mockedPolicies, mockedRole));
+console.log(
+  "rolesFromMapping -> ",
+  rolesFromMapping(mockedPolicies, mockedRole).system_user.permissions
+);
 console.log(" ------------------ end ----------------------");
