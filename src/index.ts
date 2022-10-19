@@ -413,8 +413,9 @@ function getRoles(roles: Record<string, Role>): Roles {
 // Mappings values from Role
 // -------------------------
 
-// Given MappingKey, Roles, should check if given roles
-// fulfill the requirements for MappingRole.shouldHave
+// Given MappingKey, Roles, should
+// Get the mapping value that matches for a given set of roles
+//
 // if matches for "true" should return "true"
 // if matches for "false" should return "false"
 // if not matches should print a warning and return ""
