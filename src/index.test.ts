@@ -80,7 +80,7 @@ describe("PolicyRolesAdapter", () => {
   });
 
   describe("PolicyRolesAdapter.rolesFromMapping", () => {
-    test("Given a policy with a value that is not present in Mapping, should show console.error ", async () => {
+    test("Given a policy with a value that is not present in Mapping, should display an error in console ", async () => {
       const consoleSpy = jest
         .spyOn(console, "error")
         .mockImplementation(() => {});
