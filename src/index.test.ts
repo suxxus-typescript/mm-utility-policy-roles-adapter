@@ -1,4 +1,4 @@
-import { MattermostPermissions as Permissions } from "./mockData";
+import Permissions from "./permissions";
 import { mappingValueFromRoles, rolesFromMapping } from "./index";
 
 function addPermissionToRole(permission, role) {
