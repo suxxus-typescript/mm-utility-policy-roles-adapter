@@ -474,14 +474,14 @@ export function mappingValueFromRoles(
 
       if (role) {
         const hasPermission = role.permissions.includes(permission);
-        const cond1 = shouldHave && hasPermission;
-        const cond2 = !shouldHave && !hasPermission;
+        const conditionTrue = shouldHave && hasPermission;
+        const conditionFalse = !shouldHave && !hasPermission;
 
         switch (true) {
-          case cond1:
+          case conditionTrue:
             value = "true";
             break;
-          case cond2:
+          case conditionFalse:
             value = "false";
             break;
         }
@@ -491,7 +491,7 @@ export function mappingValueFromRoles(
 
   if (value === "") {
     console.warn(
-      `Warning: The given "${mappingKey}" is not present in Mapping`
+      `Warning: No matching mapping value found for key "${mappingKey}" with the given roles.`
     );
   }
 
