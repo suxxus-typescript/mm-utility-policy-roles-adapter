@@ -1,25 +1,8 @@
 import * as D from "json-decoder";
 import Permissions from "./permissions";
+import { Role } from "./roles";
 
 import { mockedPolicies, mockedRole } from "./mockData";
-
-// @mattermost types
-// ----------------
-type Role = {
-  id: string;
-  name: string;
-  display_name: string;
-  description: string;
-  create_at: number;
-  update_at: number;
-  delete_at: number;
-  permissions: string[];
-  scheme_managed: boolean;
-  built_in: boolean;
-};
-
-// private types
-// -------------
 
 // enumeration of possible values for Mapping type
 enum MMPermission {
