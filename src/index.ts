@@ -1,6 +1,7 @@
 import * as D from "json-decoder";
-import Permissions from "./permissions.ts";
-import { mockedPolicies, mockedRole } from "./mockData.ts";
+import Permissions from "./permissions";
+
+import { mockedPolicies, mockedRole } from "./mockData";
 
 // @mattermost types
 // ----------------
