@@ -10,3 +10,13 @@ services:
       - .:/app
       - .src:/app
       - ./node_modules:/app
+  tests:
+    image: policy-roles-adapter/test
+    build:
+      context: .
+      dockerfile: jestTests.Dockerfile
+    container_name: policy-roles-adapter-test
+    volumes:
+      - .:/app
+      - .src:/app
+      - .node_modules:/app

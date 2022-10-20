@@ -6,4 +6,4 @@ RUN npm install
 
 RUN cd /app && ls -a
 
-CMD ["npm", "start"]
+CMD ["npm", "run", "test:watch"]
