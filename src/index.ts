@@ -509,16 +509,15 @@ export function mappingValueFromRoles(
 
 // logs
 // -------
-//
-// console.log(" ------------------ start ----------------------");
-// console.log(
-//   "rolesFromMapping -> ",
-//   rolesFromMapping(mockedPolicies, mockedRole)
-// );
-// // rolesFromMapping(mockedPolicies, mockedRole);
-//
-// console.log(
-//   "mappingValueFromRoles ->",
-//   mappingValueFromRoles("enableTeamCreation", mockedRole)
-// );
-// console.log(" ------------------ end ----------------------");
+
+console.log(" ------------------ start ----------------------");
+console.log(
+  "rolesFromMapping -> ",
+  rolesFromMapping(mockedPolicies, mockedRole)
+);
+
+console.log(
+  "mappingValueFromRoles ->",
+  mappingValueFromRoles("enableTeamCreation", mockedRole)
+);
+console.log(" ------------------ end ----------------------");
