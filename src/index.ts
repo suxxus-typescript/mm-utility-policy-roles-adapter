@@ -133,7 +133,7 @@ function checkPolicies(policies: D.Result<Policy>): Policy {
     case "ERR":
       console.error(
         policies.message,
-        ", Ckeck policy key and values, given object do not match with Policy type"
+        `values for Policy should be "true", "false" or undefined`
       );
       return {} as Policy;
     default:
