@@ -1,11 +1,12 @@
 version: "0"
 services:
   develop:
-    image: policy-role-adapter/dev
+    image: policy-roles-adapter/dev
     build:
       context: .
       dockerfile: dev.Dockerfile
-    container_name: policy-role-adapter-dev
+    container_name: policy-roles-adapter-dev
     volumes:
-      - ./src:/app/src
-      - ./node_modules:/app/
+      - .:/app
+      - .src:/app
+      - ./node_modules:/app
