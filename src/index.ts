@@ -21,31 +21,26 @@ type MappingKey =
   | "enableTeamCreation"
   | "editOthersPosts"
   | "enableOnlyAdminIntegrations";
-
-type MappingOptions = "true" | "false";
+type MappingOption = "true" | "false";
 type MappingRoleName =
   | "team_user"
   | "team_admin"
   | "system_admin"
   | "system_user";
-
 type MappingRole = {
   roleName: MappingRoleName;
   permission: MMPermission;
   shouldHave: boolean;
 };
-
 type MappingValue = {
   true: MappingRole[];
   false: MappingRole[];
 };
-
 type Mapping = {
   enableTeamCreation: MappingValue;
   editOthersPosts: MappingValue;
   enableOnlyAdminIntegrations: MappingValue;
 };
-
 type MMPermissions = {
   CREATE_TEAM: string;
   EDIT_OTHERS_POSTS: string;
@@ -74,7 +69,9 @@ type Roles = {
   team_user: Role;
 };
 
-// Decoders, to check if JSON object is valid
+// Decoders, to check if unknown object is valid,
+// also usefull to check the validity of types
+// after JSON has been decoded
 // -------------------------------------------
 
 const policyTrueDecoder = D.exactDecoder("true");
@@ -125,8 +122,8 @@ function decodePolicies(policies: unknown): D.Result<Policy> {
   return policyDecoder.decode(policies).map(removeUndefinedPropertiesPolicy);
 }
 
-// Given D.Result<Policy> should check Result.type === "Ok" and return Policy
-// else show annerror and return empty Policy
+// Given D.Result<Policy> should check Result.type === "OK" and return Policy
+// else show an error and return empty object
 //
 // D.Result<Policy> => Policy
 function checkPolicies(policies: D.Result<Policy>): Policy {
@@ -134,19 +131,22 @@ function checkPolicies(policies: D.Result<Policy>): Policy {
     case "OK":
       return policies.value;
     case "ERR":
-      console.error(policies.message, ", Ckeck policy key and values");
+      console.error(
+        policies.message,
+        ", Ckeck policy key and values, given object do not match with Policy type"
+      );
       return {} as Policy;
     default:
       return {} as Policy;
   }
 }
 
-// Given permissions JSON object, should return true if policies are valid
+// Given permissions object, should return true if key/value are valid,
 // else show an error return false
-// we need to ckeck if MMPermission match with mattermost Permissions Object
+// we need to validate MMPermission, to match mattermost permissions keys/values
 //
-// (unknown) => boolean
-function isValidPermissions(permissions: unknown): boolean {
+// unknown => boolean
+function isValidPermissions(permissions: unknown = {}): boolean {
   const result = mattermostPermissionsDecoder.decode(permissions);
   switch (result.type) {
     case "OK":
@@ -163,34 +163,37 @@ function isValidPermissions(permissions: unknown): boolean {
 // Roles data
 // ------------
 
-// Given Mapping, MappingKey, MappingOptions, should return a list of MappingRole
+// Given Mapping, MappingKey, MappingOption, should return a list of MappingRole
 //
-// Mapping => MappingKey => MappingOptions => MappingRole[]
+// Mapping => MappingKey => MappingOption => MappingRole[]
 function getMappingRoles(
   mapping: Mapping,
   key: MappingKey,
-  value: MappingOptions
+  value: MappingOption
 ): MappingRole[] {
   return mapping[key][value];
 }
 
-// Given MMPermission, RoleValue, should
-// update permissios list with oermission value
-// RoleValue permissions list should contain unique values
+// Given MMPermission, Role, should
+// add to role.permissions permission value
+// role permissions list should contain unique values
 //
 // MMPermission => Role => Role
-function addPermissionToRoleValue(permission: MMPermission, role: Role): Role {
+function addPermissionToRolePermissions(
+  permission: MMPermission,
+  role: Role
+): Role {
   return {
     ...role,
     permissions: [...new Set([...role.permissions, permission])],
   };
 }
 
-// Given MMPermission, RoleValue, should remove the permission
-// from RoleValue permissions list
+// Given MMPermission, Role, should remove the permission
+// from role.permissions list
 //
 // MMPermission => RoleValue => RoleValue
-function removePermissionToRoleValue(
+function removePermissionFromRolePermissions(
   permission: MMPermission,
   role: Role
 ): Role {
@@ -203,25 +206,25 @@ function removePermissionToRoleValue(
 }
 
 // Given list MappingRole, Roles, iterate over MappingRole comparing
-// MappingRole.name with Roles keys, if equals add or remove permission
+// MappingRole.name with Roles keys, if equals add or remove permission from role,
 // based on shouldHave value
 //
 // MappingRole[] => Roles => Roles
 function addOrRemovePermissions(
   mappingRoles: MappingRole[],
-  role: Roles
+  roles: Roles
 ): Roles {
   return mappingRoles.reduce((acc, mappingRole) => {
     const { roleName, permission, shouldHave } = mappingRole;
     const roleValue = acc[roleName];
     if (roleValue) {
       const newRoleValue = shouldHave
-        ? addPermissionToRoleValue(permission, roleValue)
-        : removePermissionToRoleValue(permission, roleValue);
+        ? addPermissionToRolePermissions(permission, roleValue)
+        : removePermissionFromRolePermissions(permission, roleValue);
       return { ...acc, [roleName]: newRoleValue };
     }
     return acc;
-  }, role);
+  }, roles);
 }
 
 // Policy data
@@ -237,15 +240,15 @@ function getPolicyMappingRoles(
   mapping: Mapping
 ): MappingRole[] {
   if (Object.keys(policy).length === 0) {
-    return [];
+    return [] as MappingRole[];
   }
 
   return Object.entries(policy).flatMap(([key, value]) =>
-    getMappingRoles(mapping, key as MappingKey, value as MappingOptions)
+    getMappingRoles(mapping, key as MappingKey, value as MappingOption)
   );
 }
 
-// Should return Mapping, using MMPermission
+// Should return a Mapping type object
 //
 // () => Mapping
 function getMapping(): Mapping {
@@ -391,8 +394,8 @@ function updateWithDefaultRoles(
 }
 
 // Given unknown policies, unknown roles,
-// ckeck that roles and policies are valid.
-// should return a new Roles with the updated permissions
+// ckeck that roles and policies are valid.If yes should
+// return a new Roles with the updated permissions for each role
 //
 // unnown => unknown => unknown => Roles
 function getUpdatedRoles(
@@ -405,23 +408,27 @@ function getUpdatedRoles(
 
   const decodedPolicies = decodePolicies(policies);
   const checkedPolicies = checkPolicies(decodedPolicies);
+
   if (Object.keys(checkedPolicies).length === 0) {
     return getDefaultRoles();
   }
 
-  const mapping = getMapping();
-  const mappingRoles = getPolicyMappingRoles(checkedPolicies, mapping);
+  const mappingRoles = getPolicyMappingRoles(checkedPolicies, getMapping());
 
   const mappingRoleNames = mappingRoles.map((mappingRole) => {
     return mappingRole.roleName;
   });
 
-  const filteredRoles = updateWithDefaultRoles(roles, mappingRoleNames);
+  const updatedWithDefaultRoles = updateWithDefaultRoles(
+    roles,
+    mappingRoleNames
+  );
 
-  return addOrRemovePermissions(mappingRoles, filteredRoles);
+  return addOrRemovePermissions(mappingRoles, updatedWithDefaultRoles);
 }
 
-// should remove the not updated roles
+// Given unknown policies object, and Record<string,Role>,
+// should the return the updated part of the roles object
 //
 // unnown => unknown => Record<string, Role>
 export function rolesFromMapping(
@@ -441,7 +448,7 @@ export function rolesFromMapping(
 // -------------------------
 
 // Given MappingKey, Roles, should
-// Get the mapping value that matches for a given set of roles
+// get the mapping value that matches for a given set of roles
 //
 // if matches for "true" should return "true"
 // if matches for "false" should return "false"
@@ -452,8 +459,9 @@ export function mappingValueFromRoles(
   mappingKey: MappingKey,
   roles: Record<string, Role>
 ): string {
-  const mappingRolesTrue = getMappingRoles(getMapping(), mappingKey, "true");
-  const mappingRolesFalse = getMappingRoles(getMapping(), mappingKey, "false");
+  const mapping = getMapping();
+  const mappingRolesTrue = getMappingRoles(mapping, mappingKey, "true");
+  const mappingRolesFalse = getMappingRoles(mapping, mappingKey, "false");
 
   let value = "";
 
@@ -482,7 +490,9 @@ export function mappingValueFromRoles(
   });
 
   if (value === "") {
-    console.warn(`Warning: Could not get value for ${mappingKey} from roles.`);
+    console.warn(
+      `Warning: The given "${mappingKey}" is not present in Mapping`
+    );
   }
 
   return value;
