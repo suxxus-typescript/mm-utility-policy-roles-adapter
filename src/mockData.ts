@@ -3,9 +3,24 @@ import Permissions from "./permissions";
 // mocked data
 // ------------
 //
-// dummy roleSS
+// dummy default Role
+const role = {
+  id: "",
+  name: "",
+  display_name: "",
+  description: "",
+  create_at: 0,
+  update_at: 0,
+  delete_at: 0,
+  permissions: [],
+  scheme_managed: false,
+  built_in: false,
+};
+
+// dummy role
 export const mockedRole = {
   channel_user: {
+    ...role,
     name: "channel_user",
     permissions: [
       Permissions.EDIT_POST,
@@ -14,6 +29,7 @@ export const mockedRole = {
     ],
   },
   team_user: {
+    ...role,
     name: "team_user",
     permissions: [
       Permissions.INVITE_USER,
@@ -27,14 +43,17 @@ export const mockedRole = {
     ],
   },
   channel_admin: {
+    ...role,
     name: "channel_admin",
     permissions: [Permissions.MANAGE_CHANNEL_ROLES],
   },
   team_admin: {
+    ...role,
     name: "team_admin",
     permissions: [Permissions.DELETE_POST, Permissions.DELETE_OTHERS_POSTS],
   },
   system_admin: {
+    ...role,
     name: "system_admin",
     permissions: [
       Permissions.DELETE_PUBLIC_CHANNEL,
@@ -46,10 +65,9 @@ export const mockedRole = {
     ],
   },
   system_user: {
+    ...role,
     name: "system_user",
     permissions: [],
-    id: "system_user",
-    display_name: "system_user",
   },
 };
 
