@@ -80,7 +80,7 @@ describe("PolicyRolesAdapter", () => {
   });
 
   describe("PolicyRolesAdapter.rolesFromMapping", () => {
-    test("given a policy with a value that is not present in mapping, should show console.error ", async () => {
+    test("Given a policy with a value that is not present in Mapping, should show console.error ", async () => {
       const consoleSpy = jest
         .spyOn(console, "error")
         .mockImplementation(() => {});
@@ -95,12 +95,12 @@ describe("PolicyRolesAdapter", () => {
       expect(Object.keys(updatedRoles).length).toEqual(0);
     });
 
-    test("mock data setup", () => {
+    test("Mock data setup", () => {
       const updatedRoles = rolesFromMapping(policies, roles);
       expect(Object.values(updatedRoles).length).toEqual(0);
     });
 
-    describe("enableTeamCreation", () => {
+    describe("EnableTeamCreation", () => {
       test("Given policy enableTeamCreation as 'true' should update system_user pernissions list", () => {
         roles.system_user.permissions = [];
         const updatedRoles = rolesFromMapping(
@@ -123,7 +123,7 @@ describe("PolicyRolesAdapter", () => {
         );
       });
 
-      test("it only returns the updated roles", () => {
+      test("It only returns the updated roles", () => {
         let updatedRoles = rolesFromMapping(
           { enableTeamCreation: "true" },
           roles
@@ -137,7 +137,7 @@ describe("PolicyRolesAdapter", () => {
     // ----------------------------
     describe("PolicyRolesAdapter.mappingValueFromRoles", () => {
       describe("enableTeamCreation", () => {
-        test("returns the expected policy value for a enableTeamCreation policy", () => {
+        test("Returns the expected policy value for a enableTeamCreation policy", () => {
           addPermissionToRole(Permissions.CREATE_TEAM, roles.system_user);
           let value = mappingValueFromRoles("enableTeamCreation", roles);
           expect(value).toEqual("true");
@@ -149,7 +149,7 @@ describe("PolicyRolesAdapter", () => {
       });
 
       describe("editOthersPosts", () => {
-        test("returns the expected policy value for a editOthersPosts policy", () => {
+        test("Returns the expected policy value for a editOthersPosts policy", () => {
           addPermissionToRole(
             Permissions.EDIT_OTHERS_POSTS,
             roles.system_admin
