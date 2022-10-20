@@ -1,4 +1,4 @@
-import Permission from "./permissions";
+import Permissions from "./permissions";
 
 // mocked data
 // ------------
