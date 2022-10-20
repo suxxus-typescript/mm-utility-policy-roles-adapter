@@ -464,10 +464,10 @@ export function rolesFromMapping(
 // if matches for "false" should return "false"
 // if not matches should print a warning and return ""
 //
-// MappingKey => Roles => string
+// MappingKey => Record<string, Role> => string
 export function mappingValueFromRoles(
   mappingKey: MappingKey,
-  roles: Roles
+  roles: Record<string, Role>
 ): string {
   const mappingRolesTrue = getMappingRoles(getMapping(), mappingKey, "true");
   const mappingRolesFalse = getMappingRoles(getMapping(), mappingKey, "false");
