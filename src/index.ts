@@ -1,9 +1,6 @@
 import * as D from "json-decoder";
-import {
-  MattermostPermissions,
-  mockedPolicies,
-  mockedRole,
-} from "./mockData.ts";
+import Permissions from "./permissions.ts";
+import { mockedPolicies, mockedRole } from "./mockData.ts";
 
 // @mattermost types
 // ----------------
@@ -418,7 +415,7 @@ function getUpdatedRoles(
   policies: unknown = {},
   roles: Record<string, Role> = {}
 ): Roles {
-  if (!isValidPermissions(MattermostPermissions)) {
+  if (!isValidPermissions(Permissions)) {
     return getDefaultRoles();
   }
 
