@@ -29,6 +29,7 @@ The `package.json` file comes with the following scripts
 ## Docker:
 ```
 cd ./mm-utility-policy-roles-adapter
+npm install
 docker compose up -d
 docker logs <container id> -f
 ```
