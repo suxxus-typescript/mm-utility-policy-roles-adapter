@@ -88,6 +88,8 @@ describe("PolicyRolesAdapter", () => {
       rolesFromMapping(policies, roles);
       expect(consoleSpy).toHaveBeenCalled();
     });
+    
+    
 
     // That way you can pass in the whole state if you want.
     test("Given an unknown policy key, should return an empty Object", () => {
@@ -154,6 +156,8 @@ describe("PolicyRolesAdapter", () => {
             Permissions.EDIT_OTHERS_POSTS,
             roles.system_admin
           );
+          addPermissionToRole(Permissions.EDIT_OTHERS_POSTS, roles.team_admin);
+
           let value = mappingValueFromRoles("editOthersPosts", roles);
           expect(value).toEqual("true");
 
@@ -161,6 +165,11 @@ describe("PolicyRolesAdapter", () => {
             Permissions.EDIT_OTHERS_POSTS,
             roles.system_admin
           );
+          removePermissionFromRole(
+            Permissions.EDIT_OTHERS_POSTS,
+            roles.team_admin
+          );
+
           value = mappingValueFromRoles("editOthersPosts", roles);
           expect(value).toEqual("false");
         });
