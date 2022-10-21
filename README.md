@@ -37,6 +37,6 @@ two docker containers
 * policy-roles-adapter/test (tests).
 
 ## Useful links:
-[Integration in the forked mattemost-web repository](https://github.com/suxxus/mattermost-webapp/blob/Feature/policy-roles-adapter-poc/utils/policy_roles_adapter.ts)
+[suxxus/mattermost-webapp; forked mattemost-web repository](https://github.com/suxxus/mattermost-webapp/blob/Feature/policy-roles-adapter-poc/utils/policy_roles_adapter.ts)
 
 To check if the integration of the refactored code is working as expected.
