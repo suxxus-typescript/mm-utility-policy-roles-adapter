@@ -21,26 +21,32 @@ type MappingKey =
   | "enableTeamCreation"
   | "editOthersPosts"
   | "enableOnlyAdminIntegrations";
+
 type MappingOption = "true" | "false";
+
 type MappingRoleName =
   | "team_user"
   | "team_admin"
   | "system_admin"
   | "system_user";
+
 type MappingRole = {
   roleName: MappingRoleName;
   permission: MMPermission;
   shouldHave: boolean;
 };
+
 type MappingValue = {
   true: MappingRole[];
   false: MappingRole[];
 };
+
 type Mapping = {
   enableTeamCreation: MappingValue;
   editOthersPosts: MappingValue;
   enableOnlyAdminIntegrations: MappingValue;
 };
+
 type MMPermissions = {
   CREATE_TEAM: string;
   EDIT_OTHERS_POSTS: string;
