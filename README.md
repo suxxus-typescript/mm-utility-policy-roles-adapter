@@ -15,7 +15,8 @@ Ticket from mattermost project [Migrate "utils/policy_roles_adapter.js" to Types
 
 ## Clone the repo & install:
 ```
-Clone the project: https://github.com/type-script-studies/mm-utility-policy-roles-adapter.git
+git clone "https://github.com/type-script-studies/mm-utility-policy-roles-adapter.git"
+
 cd  ./mm-utility-policy-roles-adapter
 npm install
 ```
@@ -29,7 +30,7 @@ The `package.json` file comes with the following scripts
 ## Docker:
 ```
 cd ./mm-utility-policy-roles-adapter
-npm install
+
 docker compose up -d
 docker logs <container id> -f
 ```
