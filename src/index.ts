@@ -157,6 +157,9 @@ function isValidPermissions(permissions: unknown = {}): boolean {
         ". MMPermission should match with mattermost Permissions, same keys and values"
       );
       return false;
+    default: {
+      return false;
+    }
   }
 }
 
