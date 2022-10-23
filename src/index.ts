@@ -390,8 +390,9 @@ function updateWithDefaultRoles(
   mappingRoleNames: MappingRoleName[]
 ): Roles {
   const defaultRoles = getDefaultRoles();
+  const uniqueMappingRoleNames = [...new Set(mappingRoleNames)];
 
-  return mappingRoleNames.reduce((acc, mappingRoleName) => {
+  return uniqueMappingRoleNames.reduce((acc, mappingRoleName) => {
     const role = roles[mappingRoleName];
     if (role) {
       const defaultRole = defaultRoles[mappingRoleName];
