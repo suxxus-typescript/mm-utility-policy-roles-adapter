@@ -139,7 +139,7 @@ function checkPolicies(policies: D.Result<Policy>): Policy {
     case "ERR":
       console.error(
         policies.message,
-        `values for Policy should be "true", "false" or undefined`
+        `values for Policy should be "true" or  "false" `
       );
       return {} as Policy;
     default:
