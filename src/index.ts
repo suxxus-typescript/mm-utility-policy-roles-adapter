@@ -422,7 +422,6 @@ function getUpdatedRoles(
   }
 
   const mappingRoles = getPolicyMappingRoles(checkedPolicies, getMapping());
-  console.log("mappingRoles", mappingRoles);
 
   const mappingRoleNames = mappingRoles.reduce(
     (acc, { roleName }) => (!acc.includes(roleName) ? [...acc, roleName] : acc),
