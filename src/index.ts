@@ -390,9 +390,7 @@ function updateWithDefaultRoles(
   mappingRoleNames: MappingRoleName[]
 ): Roles {
   const defaultRoles = getDefaultRoles();
-  const uniqueMappingRoleNames = [...new Set(mappingRoleNames)];
-
-  return uniqueMappingRoleNames.reduce((acc, mappingRoleName) => {
+  return mappingRoleNames.reduce((acc, mappingRoleName) => {
     const role = roles[mappingRoleName];
     if (role) {
       const defaultRole = defaultRoles[mappingRoleName];
@@ -424,10 +422,12 @@ function getUpdatedRoles(
   }
 
   const mappingRoles = getPolicyMappingRoles(checkedPolicies, getMapping());
+  console.log("mappingRoles", mappingRoles);
 
-  const mappingRoleNames = mappingRoles.map((mappingRole) => {
-    return mappingRole.roleName;
-  });
+  const mappingRoleNames = mappingRoles.reduce(
+    (acc, { roleName }) => (!acc.includes(roleName) ? [...acc, roleName] : acc),
+    [] as MappingRoleName[]
+  );
 
   const updatedWithDefaultRoles = updateWithDefaultRoles(
     roles,
