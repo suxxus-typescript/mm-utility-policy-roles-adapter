@@ -28,15 +28,16 @@ The `package.json` file comes with the following scripts
 * `test:watch` start watching for modifications on the provided tests.
 
 ## Docker:
+npm install if you haven't done it yet.
 ```
 cd ./mm-utility-policy-roles-adapter
 
 docker compose up -d
-docker logs <container id> -f
+docker logs <container name> -f
 ```
 two docker containers
-* policy-roles-adapter/dev (logs).
-* policy-roles-adapter/test (tests).
+* policy-roles-adapter-dev (logs).
+* policy-roles-adapter-test (tests).
 
 ## Useful links:
 **suxxus/mattermost-webapp**
