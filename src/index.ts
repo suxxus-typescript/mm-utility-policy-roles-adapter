@@ -405,7 +405,7 @@ function updateWithDefaultRoles(
 // ckeck that roles and policies are valid.If yes should
 // return a new Roles with the updated permissions for each role
 //
-// unnown => unknown => unknown => Roles
+// unnown => unknown => Roles
 function getUpdatedRoles(
   policies: unknown = {},
   roles: Record<string, Role> = {}
