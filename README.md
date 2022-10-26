@@ -44,8 +44,8 @@ two docker containers
 
 forked mattemost-web repository, to check if the integration of the refactored code works as expected.
 
-[File: policy_roles_adapter.ts](https://github.com/suxxus/mattermost-webapp/blob/Feature/policy-roles-adapter-to-ts/utils/policy_roles_adapter.ts)
+[File: policy_roles_adapter.ts](https://github.com/suxxus/mattermost-webapp/blob/Feature/%2321167-migrate-to-ts-refactor-proposal/utils/policy_roles_adapter.ts)
 
-[changes](https://github.com/mattermost/mattermost-webapp/compare/master...suxxus:Feature/policy-roles-adapter-to-ts?expand=1)
+[changes](https://github.com/mattermost/mattermost-webapp/compare/master...suxxus:mattermost-webapp:Feature/%2321167-migrate-to-ts-refactor-proposal?expand=1)
 
 
