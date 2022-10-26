@@ -9,7 +9,7 @@ Ticket from mattermost project [Migrate "utils/policy_roles_adapter.js" to Types
 * tried to follow Elm lang style.
 * every function get an input and returns an output.
 * no data mutation.
-* each unknow datatype object it's checked.
+* each unknown datatype object it's checked.
 * pass the same tests that already exists in Mattermost-web project.
 * module was isolated to be developed in NODE.
 
