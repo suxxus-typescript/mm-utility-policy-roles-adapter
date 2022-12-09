@@ -4,6 +4,7 @@
 
 Ticket from mattermost project [Migrate "utils/policy_roles_adapter.js" to Typescript #21167](https://github.com/mattermost/mattermost-server/issues/21167)
 
+**Goal for refactorization**
 
 * strongly data types.
 * tried to follow Elm lang style.
